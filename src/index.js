@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+// 需要告诉npm脚本的执行环境
 "use strict";
 
 /**

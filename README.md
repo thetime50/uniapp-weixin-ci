@@ -11,6 +11,7 @@ uniapp-weixin-ci unixpp自动编译微信小程序
 - [x] sourceMap 保存
 - [ ] 命令行参数控制
 - [ ] 配置文件控制
+- [ ] 单元测试
 
 ## 参考项目
 [uniapp-ci](https://github.com/thetime50/uniapp-ci)
