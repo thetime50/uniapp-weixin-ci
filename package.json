@@ -1,6 +1,6 @@
 {
   "name": "uniapp-weixin-ci",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "unixpp自动编译微信小程序",
   "main": "src/index.js",
   "bin": {
