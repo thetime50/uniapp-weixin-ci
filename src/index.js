@@ -126,10 +126,15 @@ function argvOptionParse(){
     const pkg = require('../package')
     program
         .version(`${pkg.name} ${pkg.version}`)
-        .option('-i, --ignore <type...>', ignoreInfo,parseIgnore,{})
         .option('-a, --annotate <string>', `tag 名称 版本号`,'') // 解析完直接更新到APP_CFG上去
         .option('-m, --message <string>', `版本更新信息`,'')
         .option('-b, --branch <string>', '选择分支','')
+        .option('-ep --err-path <path>','错误文件目录','')
+        .option('-smp --sourcemap-path <path>','sourcemap 文件目录','')
+        .option('-sp --src-path <path>','uniapp 项目目录','')
+        .option('-kf --private-key-file <file>','miniprogram-ci 微信小程序ci代码上传密钥文件','')
+        .option('-pp --project-path <path>','微信小程序目录，uniapp 编译后的目录','')
+        .option('-i, --ignore <type...>', ignoreInfo,parseIgnore,{})
         .parse(process.argv)
     appOptions = program.opts();
 
@@ -154,6 +159,22 @@ function argvOptionParse(){
     }
     if(appOptions.branch){
         APP_CFG.APP_GIT_BRANCH = appOptions.branch
+    }
+    
+    if(appOptions.errPath){
+        this.APP_ERR_PATH = presolve(appOptions.errPath)
+    }
+    if(appOptions.sourcemapPath){
+        this.APP_SOURCEMAP_PATH = presolve(appOptions.sourcemapPath)
+    }
+    if(appOptions.srcPath){
+        this.APP_SRC_PATH = presolve(appOptions.srcPath)
+    }
+    if(appOptions.privateKeyFile){
+        this.APP_PRIVATE_KEY_FILE = presolve(appOptions.privateKeyFile)
+    }
+    if(appOptions.projectPath){
+        this.APP_PROJECT_PATH = presolve(appOptions.projectPath)
     }
 }
 
