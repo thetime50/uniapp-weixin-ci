@@ -10,13 +10,14 @@
  *      3.2 - cross-env / vue-cli-service - js 执行 
  *          // 不需要 vue-cli-service还是直接从命令行获取参数的 还是要通过child_process执行
  * 4. √ ci 配置
- * 5. sourceMap 保存
+ * 5. √ sourceMap 保存
  * 6. √ git 对比
  * 7. √ 进度条
  * 8. √ 版本号自增加 版本号确认 git tag
  * 9. √ 依赖更新检查
- * 10. 打包npm 包
- * 11. code review class
+ * 10. √ 打包npm 包
+ * 11. 配置文件控制
+ * 12. code review class
  */
 
 const ora = require('ora') // 进度条
@@ -39,14 +40,30 @@ const table = require('text-table')
 
 const args = require('minimist')(process.argv.slice(2)) // 命令行参数解析 解析process.argv
 // console.log('hello'.blue.bgWhite)
+const resolve = path.resolve
+
+/**
+ * 参数配置 
+ */
+
+class APP_CFG_C {
+    APP_PLATFORM = 'mp-weixin'
+    APP_VERSION = '0.0.0'
+    APP_ERR_PATH = resolve('./outinfo')
+    APP_SOURCEMAP_PATH = resolve('./outinfo')
+    APP_SRC_PATH = resolve('./src')
+    APP_PROJECT_PATH = resolve('./dist/dev/mp-weixin')
+    APP_PRIVATE_KEY_PATH = resolve('./keys/wx-private.key')
+    APP_GIT_BRANCH = ['main','master']
+}
+
+// todo create dir
+
+const APP_CFG = new APP_CFG_C
 
 const ansiTrimRe = new RegExp('\x1b(?:\\[(?:\\d+[ABCDEFGJKSTm]|\\d+;\\d+[Hfm]|' +
           '\\d+;\\d+;\\d+m|6n|s|u|\\?25[lh])|\\w)', 'g')
 const ansiTrim = str => str.replace(ansiTrimRe, '')
-
-const APP_PLATFORM = 'mp-weixin'
-
-let APP_VERSION = '0.0.0'
 
 function delay(ms) {
     return new Promise((resolve, reject) => {
@@ -69,9 +86,10 @@ async function gitCheck(){
         // logSymbols
         // 在主分支上
         const branch = await git.branchLocal()
-        spinner = ora('check branch is main or master').start()
-        if(branch.current != 'main' && branch.current != 'master'){
-            let msg = `branch is ${branch.current.cyan} not main or master`
+        const branchStr = typeof APP_CFG.APP_GIT_BRANCH  == 'string' ? APP_CFG.APP_GIT_BRANCH : APP_CFG.APP_GIT_BRANCH.join(' or ')
+        spinner = ora(`check branch is ${branchStr}`).start()
+        if(branch.current !== APP_CFG.APP_GIT_BRANCH && !APP_CFG.APP_GIT_BRANCH.includes( branch.current)){
+            let msg = `branch is ${branch.current.cyan} not ${branchStr}`
             spinner.stop()
             console.log(msg,logSymbols.error)
             throw new Error(msg)
@@ -143,7 +161,7 @@ async function gitCheck(){
         ])
         
         spinner = ora('set tag and push remote').start()
-        APP_VERSION = tagParam.tag
+        APP_CFG.APP_VERSION = tagParam.tag
         await git.tag(['-a',tagParam.tag,'-m',`"${tagParam.message}"`])
         // tag 提交到远端
         await git.push('--tags')
@@ -334,16 +352,16 @@ async function projBuildProcess() {
     // spinner.start()
     // exec方法默认的最大允许输出到stdout和stderr的数据量不超过200K，如果超过了，子进程就会被杀死
     // await new Promise((resolve,reject)=>{
-    //     exec(`npm run build:${APP_PLATFORM}`, (error, stdout, stderr) => {
+    //     exec(`npm run build:${APP_CFG.APP_PLATFORM}`, (error, stdout, stderr) => {
     //         resolve({error, stdout, stderr})
     //     })
     // }) 
     await new Promise((resolve,reject)=>{
-        const build = spawn(process.platform === "win32" ? "npm.cmd" : "npm", ['run', `build:${APP_PLATFORM}`], {
+        const build = spawn(process.platform === "win32" ? "npm.cmd" : "npm", ['run', `build:${APP_CFG.APP_PLATFORM}`], {
             stdio: [
                 process.stdin, // Use parent’s stdin for child
                 process.stdout, // Pipe child’s stdout to parent
-                fs.openSync('./outinfo/err.out', 'w') // Direct child’s stderr to a file
+                fs.openSync(resolve(APP_CFG.APP_ERR_PATH,'err.out'), 'w') // Direct child’s stderr to a file
             ]
         })
         build.on('exit', (code, signal) => { // signal 终止子进程的信号
@@ -376,14 +394,14 @@ async function projBuildProcess() {
 async function weiXinCi(){
     console.log(`*** 微信小程序ci发布 ***`.blue.bgWhite,)
     const ci = require('miniprogram-ci')
-    const platform = requireJSON5('./src/manifest.json')[APP_PLATFORM]
+    const platform = requireJSON5(resolve(APP_CFG.APP_SRC_PATH,'manifest.json'))[APP_CFG.APP_PLATFORM]
     const robot = 1
     // todo
     const project = new ci.Project({
         appid: platform.appid,
         type: 'miniProgram',
-        projectPath: 'dist/dev/mp-weixin',
-        privateKeyPath: 'keys/wx-private.key',
+        projectPath: APP_CFG.APP_PROJECT_PATH,
+        privateKeyPath: APP_CFG.APP_PRIVATE_KEY_PATH,
         ignores: ['node_modules/**/*'],
     })
     console.log(`ci.Project`.blue.bgWhite,project)
@@ -399,7 +417,7 @@ async function weiXinCi(){
         robot,
     })
     console.log(`完成应用代码上传`.blue.bgWhite,uploadResult)
-    const destPath = `./outinfo/source-map-${APP_VERSION}.zip`
+    const destPath = resolve(APP_CFG.APP_SOURCEMAP_PATH, `source-map-${APP_CFG.APP_VERSION}.zip`) 
     const sourceMapRes = await ci.getDevSourceMap({
         project,
         robot,
