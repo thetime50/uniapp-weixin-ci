@@ -7,7 +7,15 @@
     "wxci-publish": "src/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "preinstall": "echo preinstall",
+    "install": "echo install",
+    "postinstall": "echo postinstall",
+    "prepublish": "echo prepublish",
+    "preprepare": "echo preprepare",
+    "prepare": "echo prepare",
+    "postprepare": "echo postprepare",
+    "deploy": "npm version patch && npm publish",
+    "prepublishOnly": "git push --follow-tags"
   },
   "repository": {
     "type": "git",
