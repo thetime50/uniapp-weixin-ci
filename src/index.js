@@ -34,13 +34,12 @@ require('colors') // 命令行输出颜色 // cli-color // todo colors-plue 参�
 
 const simpleGit = require( 'simple-git');
 
-// const ansiTrim = require('npm/lib/utils/ansi-trim.js')
 const table = require('text-table')
 // const styles = require('ansistyles')
 
 const args = require('minimist')(process.argv.slice(2)) // 命令行参数解析 解析process.argv
 // console.log('hello'.blue.bgWhite)
-const resolve = path.resolve
+const presolve = path.resolve
 
 /**
  * 参数配置 
@@ -54,11 +53,11 @@ class APP_CFG_C {
         this.APP_PLATFORM = 'mp-weixin'
         this.APP_VERSION = '0.0.0'
         this.APP_MESSAGE = '更新'
-        this.APP_ERR_PATH = resolve('./outinfo')
-        this.APP_SOURCEMAP_PATH = resolve('./outinfo')
-        this.APP_SRC_PATH = resolve('./src')
-        this.APP_PROJECT_PATH = resolve('./dist/dev/mp-weixin')
-        this.APP_PRIVATE_KEY_PATH = resolve('./keys/wx-private.key')
+        this.APP_ERR_PATH = presolve('./outinfo')
+        this.APP_SOURCEMAP_PATH = presolve('./outinfo')
+        this.APP_SRC_PATH = presolve('./src')
+        this.APP_PRIVATE_KEY_FILE = presolve('./keys/wx-private.key')
+        this.APP_PROJECT_PATH = presolve('./dist/build/mp-weixin')
         this.APP_GIT_BRANCH = ['main','master']
     }
 }
@@ -164,6 +163,38 @@ function ignoreCheck(flag){ // 如果返回true 跳过执行
         console.log(`ignore ${ignoreInfoList[flag]}`,logSymbols.info)
     }
     return res
+}
+
+function isDirectory(path){
+    try {
+        var stat = fs.statSync(path);
+        return stat.isDirectory();
+    } catch (error) {
+        return false
+    }
+}
+function isFile(path){
+    try {
+        var stat = fs.statSync(path);
+        return stat.isFile();
+    } catch (error) {
+        return false
+    }
+}
+async function appCfgCheck(){
+    if(!isDirectory(APP_CFG.APP_ERR_PATH)){
+        fs.mkdirSync(APP_CFG.APP_ERR_PATH)
+        await delay(20)
+    }
+    if(!isDirectory(APP_CFG.APP_SOURCEMAP_PATH)){
+        fs.mkdirSync(APP_CFG.APP_SOURCEMAP_PATH)
+    }
+    if(!isFile(presolve(APP_CFG.APP_SRC_PATH,'manifest.json'))){
+        throw new Error(`找不到文件 ${presolve(APP_CFG.APP_SRC_PATH,'manifest.json')}`)
+    }
+    if(!isFile(presolve(APP_CFG.APP_PRIVATE_KEY_FILE,))){
+        throw new Error(`找不到文件 ${presolve(APP_CFG.APP_PRIVATE_KEY_FILE,)}`)
+    }
 }
 
 const ansiTrimRe = new RegExp('\x1b(?:\\[(?:\\d+[ABCDEFGJKSTm]|\\d+;\\d+[Hfm]|' +
@@ -503,7 +534,7 @@ async function projBuildProcess() {
             stdio: [
                 process.stdin, // Use parent’s stdin for child
                 process.stdout, // Pipe child’s stdout to parent
-                fs.openSync(resolve(APP_CFG.APP_ERR_PATH,'err.out'), 'w') // Direct child’s stderr to a file
+                fs.openSync(presolve(APP_CFG.APP_ERR_PATH,'err.out'), 'w') // Direct child’s stderr to a file
             ]
         })
         build.on('exit', (code, signal) => { // signal 终止子进程的信号
@@ -536,15 +567,18 @@ async function projBuildProcess() {
 async function weiXinCi(){
     if(ignoreCheck('ci')) return
     console.log(`*** 微信小程序ci发布 ***`.blue.bgWhite,)
+    if(!isFile(presolve(APP_CFG.APP_PROJECT_PATH,'app.json'))){
+        throw new Error(`找不到文件 ${presolve(APP_CFG.APP_PROJECT_PATH,'app.json')}`)
+    }
     const ci = require('miniprogram-ci')
-    const platform = requireJSON5(resolve(APP_CFG.APP_SRC_PATH,'manifest.json'))[APP_CFG.APP_PLATFORM]
+    const platform = requireJSON5(presolve(APP_CFG.APP_SRC_PATH,'manifest.json'))[APP_CFG.APP_PLATFORM]
     const robot = 1
     // todo
     const project = new ci.Project({
         appid: platform.appid,
         type: 'miniProgram',
         projectPath: APP_CFG.APP_PROJECT_PATH,
-        privateKeyPath: APP_CFG.APP_PRIVATE_KEY_PATH,
+        privateKeyPath: APP_CFG.APP_PRIVATE_KEY_FILE,
         ignores: ['node_modules/**/*'],
     })
     console.log(`ci.Project`.blue.bgWhite,project)
@@ -562,7 +596,7 @@ async function weiXinCi(){
     
     if(!ignoreCheck('cs')){
         console.log(`完成应用代码上传`.blue.bgWhite,uploadResult)
-        const destPath = resolve(APP_CFG.APP_SOURCEMAP_PATH, `source-map-${APP_CFG.APP_VERSION}.zip`) 
+        const destPath = presolve(APP_CFG.APP_SOURCEMAP_PATH, `source-map-${APP_CFG.APP_VERSION}.zip`) 
         const sourceMapRes = await ci.getDevSourceMap({
             project,
             robot,
@@ -579,6 +613,7 @@ async function weiXinCi(){
  */
 const methods = {
     argvOptionParse:argvOptionParse,
+    appCfgCheck:appCfgCheck,
     gitCheck:gitCheck,
     npmOutdated:npmOutdated,
     projBuild: projBuildProcess,
@@ -588,9 +623,11 @@ const methods = {
 ;
 (async function main(){
     await methods.argvOptionParse()
+    await methods.appCfgCheck()
     await methods.gitCheck()
     await methods.npmOutdated()
     await methods.projBuild()
     await methods.ci()
-    console.log('应用发布完成'.bold.black.bgWhite)
+    console.log('\n','执行完成'.bold.black.bgWhite)
+    process.exit()
 })()
