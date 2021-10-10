@@ -1,7 +1,7 @@
 {
   "name": "uniapp-weixin-ci",
   "version": "0.0.2",
-  "description": "unixpp自动编译微信小程序",
+  "description": "unixpp自动编译 发布微信小程序",
   "main": "src/index.js",
   "bin": {
     "wxci-publish": "src/index.js"

@@ -44,4 +44,36 @@ npm install -D uniapp-weixin-ci
 运行 <code>npm run wxci-publish</code> 发布小程序
 ```cmd
 npm run wxci-publish
+npm wxci-publish
 ```
+
+```cmd
+> npx wxci-publish -h
+
+Usage: index [options]
+
+Options:
+  -V, --version                  output the version number
+  -a, --annotate <string>        tag 名称 版本号 (default: "")
+  -m, --message <string>         版本更新信息 (default: "")
+  -b, --branch <string>          选择分支 (default: "")
+  -ep --err-path <path>          错误文件目录 (default: "")
+  -smp --sourcemap-path <path>   sourcemap 文件目录 (default: "")
+  -sp --src-path <path>          uniapp 项目目录 (default: "")
+  -kf --private-key-file <file>  miniprogram-ci 微信小程序ci代码上传密钥文件 (default: "")
+  -pp --project-path <path>      微信小程序目录，uniapp 编译后的目录 (default: "")  -i, --ignore <type...>         跳过的操作步骤:
+          git: 跳过所有git操作
+          gb: 跳过git branch 检查
+          gf: 跳过git fetch origin
+          gd: 跳过git diff
+          gt: 跳过git tag
+
+          npm-outdated/no: 跳过npm outdated依赖更新检查
+
+          build/b: 跳过npm run build:mp-weixin 编译小程序
+
+          ci: 跳过所有ci操作 (上传 下载sourceMap)
+          cs: 跳过下载sourceMap
+       (default: {})
+  -h, --help                     display help for command
+  ```
