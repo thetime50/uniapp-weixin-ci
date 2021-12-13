@@ -1,19 +1,13 @@
 {
   "name": "uniapp-weixin-ci",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "unixpp自动编译 发布微信小程序",
   "main": "src/index.js",
   "bin": {
     "wxci-publish": "src/index.js"
   },
   "scripts": {
-    "preinstall": "echo preinstall",
-    "install": "echo install",
-    "postinstall": "echo postinstall",
-    "prepublish": "echo prepublish",
-    "preprepare": "echo preprepare",
-    "prepare": "echo prepare",
-    "postprepare": "echo postprepare",
+    "postinstall": "node lifecycleScripts/postinstall.js",
     "deploy": "npm version patch && npm publish",
     "prepublishOnly": "git push --follow-tags"
   },
@@ -42,6 +36,7 @@
     "minimist": "^1.2.5",
     "miniprogram-ci": "^1.6.1",
     "ora": "^3.4.0",
+    "read-package-json-fast": "^2.0.3",
     "require-json5": "^1.1.0",
     "simple-git": "^2.45.1",
     "text-table": "^0.2.0"
