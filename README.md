@@ -44,7 +44,8 @@ npm install -D uniapp-weixin-ci
 运行 <code>npm run wxci-publish</code> 发布小程序
 ```cmd
 npm run wxci-publish
-npm wxci-publish
+:: or
+npx wxci-publish
 ```
 
 ```cmd
