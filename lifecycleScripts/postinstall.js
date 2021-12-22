@@ -1,19 +1,19 @@
 // #!/usr/bin/env node
 // const readPackageJson = require('read-package-json-fast')
+const path = require('path')
 const projectPath = path.resolve( process.cwd(), '../../' )
 module.exports = async function(){
     const fs = require('fs')
-    const path = require('path')
     // let file = path.resolve( projectPath,'file.txt')
     // let data = {
     //     a: 1
     // }
     // // 异步写入数据到文件
     // fs.writeFile(file, JSON.stringify(data, null, 4), { encoding: 'utf8' }, err => {})\
-    // const pkgPath = path.resolve(projectPath, 'package.json')
+    const pkgPath = path.resolve(projectPath, 'package.json')
     // let pkgStr = await fs.readFile(pkgPath)
     // const pkg = JSON.parse(pkgStr)
-    // const pkg = require(pkgPath)
+    const pkg = require(pkgPath)
     if(!pkg.scripts['wxci-publish']){
       pkg.scripts['wxci-publish'] = 'npx wxci-publish'
       fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2), { encoding: 'utf8' }, err => {})
