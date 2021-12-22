@@ -10,12 +10,13 @@ module.exports = async function(){
     const pkg = require(pkgPath)
     if(pkg.scripts['wxci-publish']){
       delete pkg.scripts['wxci-publish']
+      console.log(`pkg`, pkg)
       fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2), { encoding: 'utf8' }, err => {})
     }
     console.info("[nodegit] Completed installation successfully.");
 }
 
-console.log('uniapp-weixin-ci postinstall ...')
+console.log('uniapp-weixin-ci postuninstall ...')
 if (require.main === module) {
   module.exports()
     .catch(function(e) {
