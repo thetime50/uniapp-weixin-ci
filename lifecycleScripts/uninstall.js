@@ -1,4 +1,8 @@
 // #!/usr/bin/env node
+
+// https://docs.npmjs.com/cli/v7/using-npm/scripts#a-note-on-a-lack-of-npm-uninstall-scripts
+// npm v6 有uninstall生命周期脚本，但 npm v7 没有
+
 // const readPackageJson = require('read-package-json-fast')
 const path = require('path')
 const projectPath = path.resolve( process.cwd(), '../../' )
