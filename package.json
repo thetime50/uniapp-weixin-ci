@@ -8,6 +8,7 @@
   },
   "scripts": {
     "postinstall": "node lifecycleScripts/postinstall.js",
+    "postuninstall": "node lifecycleScripts/postuninstall.js",
     "deploy": "npm version patch && npm publish",
     "prepublishOnly": "git push --follow-tags"
   },

@@ -8,8 +8,8 @@ module.exports = async function(){
     // let pkgStr = await fs.readFile(pkgPath)
     // const pkg = JSON.parse(pkgStr)
     const pkg = require(pkgPath)
-    if(!pkg.scripts['wxci-publish']){
-      pkg.scripts['wxci-publish'] = 'npx wxci-publish'
+    if(pkg.scripts['wxci-publish']){
+      delete pkg.scripts['wxci-publish']
       fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2), { encoding: 'utf8' }, err => {})
     }
     console.info("[nodegit] Completed installation successfully.");
