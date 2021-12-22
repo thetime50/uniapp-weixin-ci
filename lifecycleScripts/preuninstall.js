@@ -16,7 +16,7 @@ module.exports = async function(){
     console.info("[nodegit] Completed installation successfully.");
 }
 
-console.log('uniapp-weixin-ci postuninstall ...')
+console.log('uniapp-weixin-ci preuninstall ...')
 if (require.main === module) {
   module.exports()
     .catch(function(e) {
