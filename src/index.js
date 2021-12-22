@@ -432,36 +432,36 @@ async function npmOutdated(){
  * @returns {Promise<OutdatedDependencies>} The original object returned by `npm outdated --json`.
  */
 async function getOutdatedDependencies (options) {
-	return new Promise((resolve, reject) => {
-		exec([
-			'npm outdated --json',
-			'--long',
-			// '--save false',
-		].join(' '),
+    return new Promise((resolve, reject) => {
+        exec([
+            'npm outdated --json',
+            '--long',
+            // '--save false',
+        ].join(' '),
         { stdio: ['pipe', 'pipe', 'ignore']}, // 屏蔽io流
          (error, stdout) => {
-			if (error && stdout.length === 0) {
-				reject(error);
+            if (error && stdout.length === 0) {
+                reject(error);
 
-				return;
-			}
+                return;
+            }
 
-			const response = parseResponse(stdout);
+            const response = parseResponse(stdout);
 
-			if ('error' in response) {
-				reject(response.error);
+            if ('error' in response) {
+                reject(response.error);
 
-				return;
-			}
+                return;
+            }
 
-			if (typeof response !== 'object' || response === null) {
-				reject(new TypeError('npm did not respond with an object.'));
-			}
+            if (typeof response !== 'object' || response === null) {
+                reject(new TypeError('npm did not respond with an object.'));
+            }
             // stdout.write('\033c'); // 清除控制台
 
-			resolve(prepareResponseObject(response));
-		});
-	});
+            resolve(prepareResponseObject(response));
+        });
+    });
 }
 /**
  * Adds missing properties to the dependencies object.
@@ -471,38 +471,38 @@ async function getOutdatedDependencies (options) {
  * @returns {{ [dependencyName: string]: OutdatedDependency; }} The enriched outdated dependency object.
  */
 function prepareResponseObject (dependencies) {
-	/** @type {{ [dependencyName: string]: OutdatedDependency; }} */
-	const outdatedDependencies = {};
+    /** @type {{ [dependencyName: string]: OutdatedDependency; }} */
+    const outdatedDependencies = {};
 
-	for (const [name, dependency] of Object.entries(dependencies)) {
-		// Adding the name, makes it easier to work with the dependency object.
-		const outdatedDependency = {
-			...dependency,
-			name
-		};
+    for (const [name, dependency] of Object.entries(dependencies)) {
+        // Adding the name, makes it easier to work with the dependency object.
+        const outdatedDependency = {
+            ...dependency,
+            name
+        };
 
-		for (const propertyName of ['current', 'wanted', 'latest', 'type']) {
-			if (!(propertyName in outdatedDependency)) {
-				outdatedDependency[propertyName] = '';
-			}
-		}
+        for (const propertyName of ['current', 'wanted', 'latest', 'type']) {
+            if (!(propertyName in outdatedDependency)) {
+                outdatedDependency[propertyName] = '';
+            }
+        }
 
-		/**
-		 * Sometimes, npm returns an empty `location` string. So we add it.
-		 *
-		 * @todo We should try to resolve the path on the same way as npm is doing it.
-		 *
-		 * @see path.relative(process.cwd(), require.resolve(name));
-		 * @see module.path
-		 */
-		if (!outdatedDependency.location) {
-			outdatedDependency.location = `node_modules/${name}`;
-		}
+        /**
+         * Sometimes, npm returns an empty `location` string. So we add it.
+         *
+         * @todo We should try to resolve the path on the same way as npm is doing it.
+         *
+         * @see path.relative(process.cwd(), require.resolve(name));
+         * @see module.path
+         */
+        if (!outdatedDependency.location) {
+            outdatedDependency.location = `node_modules/${name}`;
+        }
 
-		outdatedDependencies[name] = /** @type {OutdatedDependency} */(outdatedDependency);
-	}
+        outdatedDependencies[name] = /** @type {OutdatedDependency} */(outdatedDependency);
+    }
 
-	return outdatedDependencies;
+    return outdatedDependencies;
 }
 
 /**
@@ -513,31 +513,31 @@ function prepareResponseObject (dependencies) {
  * @returns {any} The parsed response, or an `object` containing an `error` property.
  */
 function parseResponse (stdout) {
-	try {
-		const response = JSON.parse(stdout || '{}');
+    try {
+        const response = JSON.parse(stdout || '{}');
 
-		if (typeof response !== 'object' || response === null) {
-			throw new Error('Unexpected JSON response');
-		}
+        if (typeof response !== 'object' || response === null) {
+            throw new Error('Unexpected JSON response');
+        }
 
-		return response;
-	}
-	catch (error) {
-		if (error instanceof Error) {
-			return {
-				error: {
-					message: error.message,
-					stack: error.stack,
-					source: stdout
-				}
-			};
-		}
+        return response;
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return {
+                error: {
+                    message: error.message,
+                    stack: error.stack,
+                    source: stdout
+                }
+            };
+        }
 
-		return {
-			message: (typeof error === 'string' ? error : 'Unknown error'),
-			source: stdout
-		};
-	}
+        return {
+            message: (typeof error === 'string' ? error : 'Unknown error'),
+            source: stdout
+        };
+    }
 }
 async function projBuildProcess() {
     if(ignoreCheck('b')) return

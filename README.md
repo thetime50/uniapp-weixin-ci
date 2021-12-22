@@ -61,7 +61,8 @@ Options:
   -smp --sourcemap-path <path>   sourcemap 文件目录 (default: "")
   -sp --src-path <path>          uniapp 项目目录 (default: "")
   -kf --private-key-file <file>  miniprogram-ci 微信小程序ci代码上传密钥文件 (default: "")
-  -pp --project-path <path>      微信小程序目录，uniapp 编译后的目录 (default: "")  -i, --ignore <type...>         跳过的操作步骤:
+  -pp --project-path <path>      微信小程序目录，uniapp 编译后的目录 (default: "")  
+  -i, --ignore <type...>         跳过的操作步骤:
           git: 跳过所有git操作
           gb: 跳过git branch 检查
           gf: 跳过git fetch origin
