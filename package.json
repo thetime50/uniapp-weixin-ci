@@ -7,7 +7,7 @@
     "wxci-publish": "src/index.js"
   },
   "scripts": {
-    "postprepare": "node lifecycleScripts/postinstall.js",
+    "postinstall": "node lifecycleScripts/postinstall.js",
     "deploy": "npm version patch && npm publish",
     "prepublishOnly": "git push --follow-tags"
   },
