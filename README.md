@@ -3,6 +3,11 @@ uniapp-weixin-ci unixpp自动编译 发布微信小程序
 
 [![View UI](https://img.shields.io/npm/v/uniapp-weixin-ci.svg?style=flat)](https://www.npmjs.org/package/uniapp-weixin-ci)
 
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/thetime50/uniapp-weixin-ci.svg)](https://starchart.cc/thetime50/uniapp-weixin-ci)
+
 ## 功能
 
 - [x] 小程序编译项目
