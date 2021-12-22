@@ -11,7 +11,7 @@ module.exports = async function(){
     // 异步写入数据到文件
     // fs.writeFile(file, JSON.stringify(data, null, 4), { encoding: 'utf8' }, err => {})
     const pkg = await readPackageJson(path.resolve(projectPath, 'package.json'))
-    // console.log(pkg)
+    console.log(pkg)
     console.log(this)
     console.info("[nodegit] Completed installation successfully.");
 }
