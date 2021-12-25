@@ -59,6 +59,7 @@ class APP_CFG_C {
         this.APP_PRIVATE_KEY_FILE = presolve('./keys/wx-private.key')
         this.APP_PROJECT_PATH = presolve('./dist/build/mp-weixin')
         this.APP_GIT_BRANCH = ['main','master']
+        this.APP_NPM_OUTDATED = false
     }
 }
 
@@ -77,7 +78,7 @@ const ignoreInfoList = {
         gd:'gd: 跳过git diff',
         gt:'gt: 跳过git tag',
     
-        no:'npm-outdated/no: 跳过npm outdated依赖更新检查',
+        // no:'npm-outdated/no: 跳过npm outdated依赖更新检查',
     
         b:'build/b: 跳过npm run build:mp-weixin 编译小程序',
     
@@ -91,8 +92,8 @@ function argvOptionParse(){
         'gf',
         'gd',
         'gt',
-        'npm-outdated',
-        'no',
+        // 'npm-outdated',
+        // 'no',
         'build',
         'b',
         'ci',
@@ -105,19 +106,19 @@ function argvOptionParse(){
         ${ignoreInfoList.gd}
         ${ignoreInfoList.gt}
 
-        ${ignoreInfoList.no}
-
         ${ignoreInfoList.b}
 
         ${ignoreInfoList.ci}
         ${ignoreInfoList.cs}
     `
+        // ${ignoreInfoList.no}
+
     function parseIgnore(value,previous){
 
         previous[value] = true
-        if(value == 'npm-outdated'){
-            previous.no = true
-        }
+        // if(value == 'npm-outdated'){
+        //     previous.no = true
+        // }
         if(value == 'build'){
             previous.b = true
         }
@@ -135,6 +136,7 @@ function argvOptionParse(){
         .option('-kf --private-key-file <file>','miniprogram-ci 微信小程序ci代码上传密钥文件','')
         .option('-pp --project-path <path>','微信小程序目录，uniapp 编译后的目录','')
         .option('-i, --ignore <type...>', ignoreInfo,parseIgnore,{})
+        .option('-no --npm-outdated','开启npm outdated依赖更新检查',false)
         .parse(process.argv)
     appOptions = program.opts();
 
@@ -155,26 +157,29 @@ function argvOptionParse(){
         APP_CFG.APP_VERSION = appOptions.annotate
     }
     if(appOptions.message){
-        this.APP_MESSAGE = appOptions.message
+        APP_CFG.APP_MESSAGE = appOptions.message
     }
     if(appOptions.branch){
         APP_CFG.APP_GIT_BRANCH = appOptions.branch
     }
     
     if(appOptions.errPath){
-        this.APP_ERR_PATH = presolve(appOptions.errPath)
+        APP_CFG.APP_ERR_PATH = presolve(appOptions.errPath)
     }
     if(appOptions.sourcemapPath){
         this.APP_SOURCEMAP_PATH = presolve(appOptions.sourcemapPath)
     }
     if(appOptions.srcPath){
-        this.APP_SRC_PATH = presolve(appOptions.srcPath)
+        APP_CFG.APP_SRC_PATH = presolve(appOptions.srcPath)
     }
     if(appOptions.privateKeyFile){
-        this.APP_PRIVATE_KEY_FILE = presolve(appOptions.privateKeyFile)
+        APP_CFG.APP_PRIVATE_KEY_FILE = presolve(appOptions.privateKeyFile)
     }
     if(appOptions.projectPath){
-        this.APP_PROJECT_PATH = presolve(appOptions.projectPath)
+        APP_CFG.APP_PROJECT_PATH = presolve(appOptions.projectPath)
+    }
+    if(appOptions.npmOutdated){
+        APP_CFG.APP_NPM_OUTDATED = true
     }
 }
 
@@ -366,7 +371,8 @@ async function gitCheck(){
 }
 
 async function npmOutdated(){
-    if(ignoreCheck('no')) return
+    // if(ignoreCheck('no')) return
+    if(!APP_CFG.APP_NPM_OUTDATED)return
     
     console.log(`*** 依赖更新检查 ***`.blue.bgWhite,)
 

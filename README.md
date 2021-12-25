@@ -75,12 +75,11 @@ Options:
           gd: 跳过git diff
           gt: 跳过git tag
 
-          npm-outdated/no: 跳过npm outdated依赖更新检查
-
           build/b: 跳过npm run build:mp-weixin 编译小程序
 
           ci: 跳过所有ci操作 (上传 下载sourceMap)
           cs: 跳过下载sourceMap
        (default: {})
+  -no --npm-outdated             开启npm outdated依赖更新检查 (default: false)
   -h, --help                     display help for command
   ```
